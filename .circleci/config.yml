@@ -69,8 +69,6 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker:
-          version: 18.09.0
-          docker_layer_caching: true
       - run: |
           TAG=$CIRCLE_BUILD_NUM
           docker build -t skanehira/docui:$TAG .
