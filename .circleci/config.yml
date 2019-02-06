@@ -59,6 +59,29 @@ jobs:
       - run:
           name: Run golint
           command: golint -set_exit_status=1 ./...
+  build-docker-image:
+    parameters:
+      go-version:
+        type: string
+    executor:
+      name: default
+      go-version: << parameters.go-version >>
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          name: Install Docker client
+          command: |
+            set -x
+            VER="18.09.0"
+            curl -L -o /tmp/docker-$VER.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$VER.tgz
+            tar -xz -C /tmp -f /tmp/docker-$VER.tgz
+            mv /tmp/docker/* /usr/bin
+      # build and push Docker image
+      - run: |
+          TAG=$CIRCLE_BUILD_NUM
+          docker build -t skanehira/docui:$TAG .
 
 workflows:
   stable-build:
@@ -77,3 +100,7 @@ workflows:
           go-version: "1.11.5"
           requires:
             - lint
+  docker-image:
+    jobs:
+      - build-docker-image::
+          go-version: "1.11.5"
