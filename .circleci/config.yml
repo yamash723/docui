@@ -12,12 +12,8 @@ executors:
     working_directory: /go/src/github.com/skanehira/docui
   docker:
     parameters:
-      go-version:
-        type: string
     docker:
-      - image: golang:<< parameters.go-version >>
-        environment:
-          GO111MODULE: "on"
+      - image: docker:18.09.1
     working_directory: /go/src/github.com/skanehira/docui
 
 commands:
@@ -69,24 +65,11 @@ jobs:
           name: Run golint
           command: golint -set_exit_status=1 ./...
   build-docker-image:
-    parameters:
-      go-version:
-        type: string
     executor:
-      name: default
-      go-version: << parameters.go-version >>
+      name: docker
     steps:
       - checkout
       - setup_remote_docker
-      - run:
-          name: Install Docker client
-          command: |
-            set -x
-            VER="18.09.0"
-            curl -L -o /tmp/docker-$VER.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$VER.tgz
-            tar -xz -C /tmp -f /tmp/docker-$VER.tgz
-            mv -f /tmp/docker/* /usr/bin
-      # build and push Docker image
       - run: |
           TAG=$CIRCLE_BUILD_NUM
           docker build -t skanehira/docui:$TAG .
