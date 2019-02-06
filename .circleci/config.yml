@@ -11,7 +11,6 @@ executors:
           GO111MODULE: "on"
     working_directory: /go/src/github.com/skanehira/docui
   docker:
-    parameters:
     docker:
       - image: docker:18.09.1
     working_directory: /go/src/github.com/skanehira/docui
@@ -93,5 +92,4 @@ workflows:
             - lint
   docker-image:
     jobs:
-      - build-docker-image:
-          go-version: "1.11.5"
+      - build-docker-image
