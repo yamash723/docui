@@ -102,5 +102,5 @@ workflows:
             - lint
   docker-image:
     jobs:
-      - build-docker-image::
+      - build-docker-image:
           go-version: "1.11.5"
