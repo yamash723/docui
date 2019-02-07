@@ -81,6 +81,7 @@ jobs:
 
     executor:
       name: docker
+      docker-version: << parameters.docker-version >>
 
     steps:
       - checkout
