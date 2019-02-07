@@ -86,11 +86,11 @@ jobs:
       - checkout
 
       - setup_remote_docker:
-        version: << parameters.docker-version >>
+          version: << parameters.docker-version >>
 
       - run:
-        - name: Build Docker Image
-        - command: docker build -t skanehira/docui .
+          name: Build Docker Image
+          command: docker build -t skanehira/docui .
 
 workflows:
   stable-build:
