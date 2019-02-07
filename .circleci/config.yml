@@ -42,7 +42,7 @@ jobs:
         type: string
 
     executor:
-      name: default
+      name: build
       go-version: << parameters.go-version >>
 
     steps:
@@ -60,7 +60,7 @@ jobs:
         type: string
 
     executor:
-      name: default
+      name: build
       go-version: << parameters.go-version >>
 
     steps:
