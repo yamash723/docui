@@ -1,7 +1,7 @@
 version: 2.1
 
 executors:
-  default:
+  build:
     parameters:
       go-version:
         type: string
@@ -10,9 +10,13 @@ executors:
         environment:
           GO111MODULE: "on"
     working_directory: /go/src/github.com/skanehira/docui
+
   docker:
+    parameters:
+      docker-version:
+        type: string
     docker:
-      - image: docker:18.09.1
+      - image: docker:<< parameters.docker-version >>
     working_directory: /go/src/github.com/skanehira/docui
 
 commands:
@@ -36,23 +40,29 @@ jobs:
     parameters:
       go-version:
         type: string
+
     executor:
       name: default
       go-version: << parameters.go-version >>
+
     steps:
       - checkout
+
       - go_mod_download
 
       - run:
           name: Run build
           command: go build
+
   lint:
     parameters:
       go-version:
         type: string
+
     executor:
       name: default
       go-version: << parameters.go-version >>
+
     steps:
       - checkout
 
@@ -63,15 +73,24 @@ jobs:
       - run:
           name: Run golint
           command: golint -set_exit_status=1 ./...
+
   build-docker-image:
+    parameters:
+      docker-version:
+        type: string
+
     executor:
       name: docker
+
     steps:
       - checkout
-      - setup_remote_docker
-      - run: |
-          TAG=$CIRCLE_BUILD_NUM
-          docker build -t skanehira/docui:$TAG .
+
+      - setup_remote_docker:
+        version: << parameters.docker-version >>
+
+      - run:
+        - name: Build Docker Image
+        - command: docker build -t skanehira/docui .
 
 workflows:
   stable-build:
@@ -82,6 +101,7 @@ workflows:
           go-version: "1.11.4"
           requires:
             - lint
+
   latest-build:
     jobs:
       - lint:
@@ -90,6 +110,8 @@ workflows:
           go-version: "1.11.5"
           requires:
             - lint
-  docker-image:
+
+  docker-image-build:
     jobs:
-      - build-docker-image
+      - build-docker-image:
+          docker-version: "18.09.1"
